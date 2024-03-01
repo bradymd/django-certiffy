@@ -26,9 +26,6 @@ rm db.sqlite3
 
 ## CONFIGURE THE DATABASE
 ```
-#rm -rf  certs/migrations
-#rm -rf  users/migrations
-python manage.py  makemigrations
 python manage.py migrate --fake-initial
 python manage.py migrate --run-syncdb
 ```
@@ -36,39 +33,41 @@ python manage.py migrate --run-syncdb
 
 ## CREATE THE ADMIN USER
 ```
-DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw \
-    python manage.py createsuperuser --email=admin@example.com --noinput
+DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python manage.py createsuperuser --email=admin@example.com --noinput
 ```
 
 
-BUG: this first user is put in Group "USER" which prevents it creating additional users.\\
+BUG: The first user"admin"  is put as Group "USER".\\
 WORKAROUND: use the tab django-admin to change the Role to "ADMIN"
 
+
+## TEST RUN IN DEBUG MODE
+```
+python manage.py runserver :8443
+```
+After login it should go to the "settings" page  to create the settings table, check the form and "update settings".
 
 ## LOCAL FIREWALL
 ```
 firewall-cmd --add-rich-rule='rule family="ipv4" port port="8443" protocol="tcp" accept' --permanent
 firewall-cmd --reload
 ```
+
 ## CONFIGURE ACCESS TO LOCALHOST
 ```
 HOSTNAME="$(hostname)"
 sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy_project/django_certiffy_project/settings.py
 ```
-## RUN IN DEBUG MODE
-```
-python manage.py runserver :8443
-# login should go to settings to create the settings table, check the form and save.
-```
 # SET UP CRON
-Run crontab add twice (don't ask why):
+Run crontab add twice:
 ```
 python manage.py crontab add
 python manage.py crontab add
 python manage.py crontab show
 ```
 
-The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.
+# ODD THING ABOUT GROUPS
+The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.\\
 This doesn't apply if you create a User and then UPDATE it to have the second group.
 
 ## RUN GUNICORN
