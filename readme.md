@@ -14,7 +14,7 @@ git clone https://github.com/bradymd/django-certiffy.git
 cd django-certiffy
 python3 -m venv venv && source venv/bin/activate
 cd django_certiffy_project
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 python3 -m pip install --upgrade pip
 ```
 
@@ -46,7 +46,7 @@ python manage.py runserver :8443
 ```
 After login it should go to the "settings" page  to create the settings table, check the form and "update settings".
 
-## LOCAL FIREWALL
+## LOCAL FIREWALL READY FOR PRODUCTION
 ```
 firewall-cmd --add-rich-rule='rule family="ipv4" port port="8443" protocol="tcp" accept' --permanent
 firewall-cmd --reload
@@ -62,7 +62,7 @@ sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy
 The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.\\
 This doesn't apply if you create a User and then UPDATE it to have the second group.
 
-## RUN GUNICORN
+## RUN GUNICORN TO RUN IN PRODUCTION
 ```
 pip install gunicorn
 #cd django_certiffy_project/
@@ -71,7 +71,7 @@ pip install gunicorn
 # configure for certs:
 #vi ../gunicorn.conf.py
 ```
-## CONFIGURE TO START
+## CONFIGURE TO START FOR PRODUCTIOIN
 ```
 #install -d /etc/systemd/system django-certiffy.service
 #systemctl enable django-certiffy.service --now
