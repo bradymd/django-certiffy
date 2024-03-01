@@ -1,6 +1,11 @@
 # THIS IS ABOUT INSTALLING FROM SCRATCH - BY EXAMPLE
 
-## CLONE
+## QUICK START FOR TRYING OUT
+```
+sh deploy.sh
+```
+
+## BUILD FOR PRODUCTION THOUGHTFULLY
 ```
 cd /var/www
 mkdir django-certiffy
