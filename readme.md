@@ -62,7 +62,7 @@ sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy
 ```
 
 # ODD THING ABOUT GROUPS
-The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.\\
+The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.\
 This doesn't apply if you create a User and then UPDATE it to have the second group.
 
 ## RUN GUNICORN TO RUN IN PRODUCTION
