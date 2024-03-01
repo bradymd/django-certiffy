@@ -1,0 +1,131 @@
+# THIS IS ABOUT INSTALLING FROM SCRATCH - BY EXAMPLE
+
+## CLONE
+```
+cd /var/www
+mkdir django-certiffy
+chown certiffy:certiffy django-certiffy
+su  certiffy
+git clone https://github.com/bradymd/django-certiffy.git
+```
+
+## INSTALL THE PYTHON ENVIRONMENT
+```
+cd django-certiffy
+python3 -m venv venv && source venv/bin/activate
+cd django_certiffy_project
+pip install -r requirements.txt
+python3 -m pip install --upgrade pip
+```
+
+## NO DB NEEDED ON INSTALL
+Empty file or remove it.
+```
+rm db.sqlite3 
+```
+
+## CONFIGURE THE DATABASE
+#rm -rf  certs/migrations
+#rm -rf  users/migrations
+python manage.py  makemigrations
+python manage.py migrate --fake-initial
+python manage.py migrate --run-syncdb
+
+
+## CREATE THE ADMIN USER
+```
+DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw \
+    python manage.py createsuperuser --email=admin@example.com --noinput
+```
+
+BUG: this first user is put in Group "USER" which prevents it creating additional users.
+WORKAROUND: use the tab django-admin to change the Role to "ADMIN"
+
+
+## LOCAL FIREWALL
+```
+firewall-cmd --add-rich-rule='rule family="ipv4" port port="8443" protocol="tcp" accept' --permanent
+firewall-cmd --reload
+```
+## CONFIGURE ACCESS TO LOCALHOST
+```
+HOSTNAME="$(hostname)"
+sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy_project/django_certiffy_project/settings.py
+```
+## RUN IN DEBUG MODE
+```
+python manage.py runserver :8443
+# login should go to settings to create the settings table, check the form and save.
+```
+# SET UP CRON
+Run crontab add twice (don't ask why):
+```
+python manage.py crontab add
+python manage.py crontab add
+python manage.py crontab show
+```
+
+The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.
+This doesn't apply if you create a User and then UPDATE it to have the second group.
+
+## RUN GUNICORN
+```
+pip install gunicorn
+#cd django_certiffy_project/
+# test:
+#	gunicorn django_certiffy_project.wsgi
+# configure for certs:
+#vi ../gunicorn.conf.py
+```
+## CONFIGURE TO START
+```
+#install -d /etc/systemd/system django-certiffy.service
+#systemctl enable django-certiffy.service --now
+```
+
+## DJANGO SYSTEMD SERVICE
+```
+[Unit]
+Description=Gunicorn instance to serve django-certiffy
+After=network.target
+
+[Service]
+User=certiffy
+Group=certiffy
+WorkingDirectory=/var/www/django-certiffy/django_certiffy_project
+Environment="PATH=/var/www/django-certiffy/venv/bin"
+#ExecStart=/var/www/django-certiffy/venv/bin/gunicorn --workers 3 -m 007 django_certiffy_project.wsgi
+ExecStart=/var/www/django-certiffy/venv/bin/gunicorn django_certiffy_project.wsgi
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## CONFIGURE APACHE TO PROXY TO GUNICORN
+/etc/apache/conf.d/ssl.conf:
+```
+<VirtualHost *:443>
+ServerName certiffy.herts.ac.uk
+SSLproxyEngine On
+Timeout 600
+<Directory /var/www/django-certiffy/django_certiffy_project/static>
+    Order allow,deny
+    Options Indexes
+    Allow from all
+</Directory>
+Alias /static/ /var/www/django-certiffy/django_certiffy_project/static/
+Alias /static/admin/ /var/www/django-certiffy/django_certiffy_project/static/admin/
+ProxyPass /static/ !
+ProxyPass / http://localhost:8443/
+ProxyPassReverse / "http://localhost:8443/"
+ErrorLog logs/django-certiffy-error.log
+TransferLog logs/django-certiffy-access.log
+LogLevel warn
+SSLEngine on
+SSLHonorCipherOrder on
+SSLCipherSuite PROFILE=SYSTEM
+SSLProxyCipherSuite PROFILE=SYSTEM
+SSLCertificateFile /etc/pki/tls/certs/certiffy2023.ca-bundle
+SSLCertificateKeyFile /etc/pki/tls/private/certiffy2023.key
+</VirtualHost>
+```
