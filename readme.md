@@ -36,7 +36,6 @@ python manage.py migrate --run-syncdb
 DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python manage.py createsuperuser --email=admin@example.com --noinput
 ```
 
-
 BUG: The first user"admin"  is put as Group "USER".\\
 WORKAROUND: use the tab django-admin to change the Role to "ADMIN"
 
@@ -57,13 +56,6 @@ firewall-cmd --reload
 ```
 HOSTNAME="$(hostname)"
 sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy_project/django_certiffy_project/settings.py
-```
-# SET UP CRON
-Run crontab add twice:
-```
-python manage.py crontab add
-python manage.py crontab add
-python manage.py crontab show
 ```
 
 # ODD THING ABOUT GROUPS
@@ -130,4 +122,12 @@ SSLProxyCipherSuite PROFILE=SYSTEM
 SSLCertificateFile /etc/pki/tls/certs/certiffy2023.ca-bundle
 SSLCertificateKeyFile /etc/pki/tls/private/certiffy2023.key
 </VirtualHost>
+```
+
+# TO FACILIATE MAILING CONTACTS AND AUTO CHECKING, SET UP CRON
+Run crontab add twice:
+```
+python manage.py crontab add
+python manage.py crontab add
+python manage.py crontab show
 ```

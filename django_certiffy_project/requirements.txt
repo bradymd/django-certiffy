@@ -5,7 +5,7 @@ cffi==1.15.1
 charset-normalizer==3.2.0
 click==8.1.7
 crispy-bootstrap5==2023.10
-cryptography==41.0.7
+cryptography
 Django==4.2.4
 django-crispy-forms==2.1
 django-crontab==0.7.1
