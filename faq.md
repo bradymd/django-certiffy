@@ -13,12 +13,12 @@ It can generate Certificate Signing Requests and Keys if that is helpful for you
 
 It can keep track of notes for each certificate - who they are for, notes on how they cert is deployed.
 
-It can grade the certifcate using Qualys ssllabs API. Helpful for keeping track of the qualify of your estate.
+It can grade the certifcate using Qualys ssllabs API. Helpful for keeping track of how secure your websites are re certs.
 
-If you have hundreds like I do, it can you guage workload, see the waves of certificates that approach.
+If you have hundreds like I do, it wold help you guage workload, see the waves of certificates that approach.
 
 ## WHAT ISN'T IT?
-It's not involved with ACME so no auto renewals going on here. But can still keep track of your these certs - I guess they should never expire cos the ACME scheme is working.
+It's not involved with ACME  - so no auto renewals going on here. But can still keep track of your these certs - I guess they should never expire cos the ACME scheme is working.
 
 ## WHY DJANGO and PYTHON and SQLLITE?
 Well I have tried a python flask version and this is just another iteration. It's a fairly small implementation - worth looking at perhaps if you are starting out with django. It was really about developing my python skills. 
