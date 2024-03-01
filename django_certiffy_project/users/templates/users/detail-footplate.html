@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+        <form id="baseform">
+            <button 
+                form="baseform"
+                type="submit" 
+                id="home" 
+                formaction="{% url 'users:index' %}"
+                method='GET'
+                class="btn btn-primary"
+                >Back</button>
+            <button 
+                form="baseform"
+                type="submit" 
+                class="btn btn-primary"
+                formaction="{% url 'users:register' %}"
+                method='GET'
+                >Create User</button>
+            </form>
+

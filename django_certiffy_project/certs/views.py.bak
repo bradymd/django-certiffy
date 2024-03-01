@@ -1,0 +1,387 @@
+from django.shortcuts import (
+    render,
+    get_object_or_404,
+    HttpResponseRedirect,
+)
+from django.contrib import messages
+from django.http import HttpResponse
+import logging
+from .models import Certificate
+from users.models import MyUser
+from .forms import CertificateForm, MailForm, MailForm2, MailForm3
+from django.urls import reverse
+from .modules import checkexpirym
+from .modules import checkgrade
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Permission
+import pytz
+from django.conf import settings
+
+EMAIL_DEFAULT_FROM = getattr(settings, "EMAIL_DEFAULT_FROM", "x")
+
+logger = logging.getLogger(__name__)
+
+
+# Create your views here.
+@login_required
+@permission_required("certs.view_certificate")
+def index(request):
+    queryset = reversed(Certificate.objects.order_by("-daystogo"))
+    context = {
+        "cert_list": queryset,
+        "user": request.user,
+        "role": request.user.get_role_display(),
+    }
+    return render(request, "certs/index.html", context)
+
+
+@login_required
+@permission_required("certs.view_certificate")
+def search(request):
+    query = request.GET.get("fqdn")
+    print(f"fqdn={query}")
+    # queryset = reversed(Certificate.objects.order_by("-daystogo"))
+    queryset = reversed(
+        Certificate.objects.filter(fqdn__icontains=query).order_by("-daystogo")
+    )
+    context = {
+        "cert_list": queryset,
+        "user": request.user,
+        "role": request.user.get_role_display(),
+    }
+    return render(request, "certs/index.html", context)
+
+
+@login_required
+@permission_required("certs.view_certificate")
+@permission_required("certs.add_certificate")
+@permission_required("certs.delete_certificate")
+@permission_required("certs.change_certificate")
+def create(request):
+    if request.method == "POST":
+        form = CertificateForm(request.POST)
+        if form.is_valid():
+            try:
+                form.save()
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Record {form.cleaned_data['fqdn']}:{form.cleaned_data['port']} added successfully!",
+                )
+            except:
+                messages.add_message(
+                    request, messages.ERROR, f"Record {fqdn}:{port} failed to add!"
+                )
+            context = {"form": CertificateForm()}
+            return render(request, "certs/create.html", context)
+    else:
+        context = {"form": CertificateForm()}
+        return render(request, "certs/create.html", context)
+
+
+@login_required
+@permission_required("certs.view_certificate")
+def detail(request, id):
+    obj = get_object_or_404(Certificate, id=id)
+    form = CertificateForm(request.POST or None, instance=obj)
+    context = {
+        "form": form,
+        "id": id,
+        "user": request.user,
+        "role": request.user.get_role_display(),
+    }
+    return render(request, "certs/detail.html", context)
+
+
+@login_required
+@permission_required("certs.view_certificate")
+@permission_required("certs.add_certificate")
+@permission_required("certs.change_certificate")
+def update(request, id):
+    obj = get_object_or_404(Certificate, id=id)
+    # without instance=obj below, it will write a new instance
+    form = CertificateForm(request.POST or None, instance=obj)
+    if request.method == "POST":
+        if form.is_valid():
+            try:
+                # Certificate.objects.get(id=id).delete()
+                form.save()
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Record {form.cleaned_data['fqdn']}:{form.cleaned_data['port']} updated!",
+                )
+            except:
+                messages.add_message(
+                    request, messages.ERROR, f"Record {fqdn}:{port} failed to update!"
+                )
+            return render(
+                request, "certs/update.html", context={"id": id, "form": form}
+            )
+        else:
+            logging.debug("Form is not valid then ... ")
+            logging.warning(form.errors)
+            messages.add_message(
+                request,
+                messages.WARNING,
+                f"Record {form.field['fqdn']}:{form.field['port']} DID NOT UPDATE!",
+            )
+            logger.debug("problem with the form")
+            return render(
+                request, "certs/update.html", context={"id": id, "form": form}
+            )
+    else:
+        # First click on Edit - there is no POST?
+        context = {
+            "form": CertificateForm(instance=obj),
+            "id": id,
+            "user": request.user,
+            "role": request.user.get_role_display(),
+        }
+        return render(request, "certs/update.html", context)
+
+
+@login_required
+@permission_required("certs.view_certificate")
+@permission_required("certs.add_certificate")
+@permission_required("certs.delete_certificate")
+@permission_required("certs.change_certificate")
+def delete(request, id):
+    obj = get_object_or_404(Certificate, id=id)
+    record = Certificate.objects.get(id=id)
+    try:
+        Certificate.objects.get(id=id).delete()
+    except:
+        messages.add_message(
+            request, messages.ALERT, f"Record {record.fqdn} failed to delete!"
+        )
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        f"Record {record.fqdn}:{record.port} deleted successfully!",
+    )
+    return HttpResponseRedirect(reverse("certs:index"))
+
+
+@login_required
+def checkexpiry(request, id):
+    obj = get_object_or_404(Certificate, id=id)
+    record = Certificate.objects.get(id=id)
+    logging.debug("checkexpiry_view:")
+    if request.method == "POST" or "GET":
+        madecontact, daysexpiry, expirydate = checkexpirym.checkexpiry(
+            record.fqdn, record.port, record.expiry_date
+        )
+        logging.debug(
+            f"madecontact= {madecontact}, daysexpiry = {daysexpiry}, expirydate = { expirydate }, record.expiry_date - {record.expiry_date})"
+        )
+        if madecontact:
+            if record.daystogo == daysexpiry:
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Still {daysexpiry} days to go !",
+                )
+            else:
+                record.daystogo = daysexpiry
+            if record.expiry_date != expirydate:
+                # changing expiry date
+                tmp_expiry_date = record.expiry_date
+                record.expiry_date = expirydate
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Updated Expiry Date from {tmp_expiry_date}",
+                )
+            record.status = "UP"
+            record.save()
+            # messages.add_message(
+            #    request,
+            #    messages.SUCCESS,
+            #    f"Record {record.fqdn}:{record.port} {record.daystogo} to go!",
+            # )
+        else:
+            # Not Valid means host could not be checked, so status DOWN
+            record.status = "DOWN"
+            record.daystogo = daysexpiry
+            record.save()
+            messages.add_message(
+                request,
+                messages.WARNING,
+                f"Host {record.fqdn}:{record.port}s is down but {record.daystogo} to go!",
+            )
+    obj = get_object_or_404(Certificate, id=id)
+    context = {"form": CertificateForm(instance=obj), "id": id}
+    return render(request, "certs/detail.html", context)
+
+
+@login_required
+def grade(request, id):
+    obj = get_object_or_404(Certificate, id=id)
+    record = Certificate.objects.get(id=id)
+    logging.debug("grade_view:")
+    if request.method == "POST" or "GET":
+        isvalid, grade = checkgrade.grade_ssllabs(record.fqdn)
+        logging.debug(f"isvalid= {isvalid}, grade= {grade})")
+        if isvalid:
+            if record.grade == grade:
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Grade {grade}  !",
+                )
+            elif record.grade != grade:
+                tmp_grade = record.grade
+                record.grade = grade
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Grade updated from {tmp_grade} to {grade}",
+                )
+            record.status = "UP"
+            record.save()
+        else:
+            # Not Valid means host could not be checked
+            record.grade = "N"
+            record.save()
+            messages.add_message(
+                request,
+                messages.WARNING,
+                f"Host could not be graded,{grade}!",
+            )
+    obj = get_object_or_404(Certificate, id=id)
+    context = {"form": CertificateForm(instance=obj), "id": id}
+    return render(request, "certs/detail.html", context)
+
+
+@login_required
+def recalculate_all(request):
+    cert_list = Certificate.objects.all()
+    for cert in cert_list:
+        madecontact, daysexpiry, expirydate = checkexpirym.checkexpiry(
+            cert.fqdn, cert.port, cert.expiry_date
+        )
+        if madecontact:
+            if cert.daystogo == daysexpiry:
+                pass
+            if cert.expiry_date != expirydate:
+                cert.expiry_date = expirydate
+        if cert.daystogo != daysexpiry:
+            cert.daystogo = daysexpiry
+        cert.save()
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        f"Recalculated!",
+    )
+    queryset = reversed(Certificate.objects.order_by("-daystogo"))
+    context = {"cert_list": queryset}
+    return render(request, "certs/index.html", context)
+
+
+@login_required
+def mail(request, id):
+    # Get the certificate in question
+    record = Certificate.objects.get(id=id)
+    me = MyUser.objects.get(username=request.user)
+    #mailform = MailForm3()
+
+    if request.method == "GET":
+        fromfield = me.email
+        logging.debug(f"debug: we are in {request.method}")
+        subject = f"{record.fqdn}:{record.port} Certificate expiry"
+        message_body = f"""This is an automated message:
+        https://{record.fqdn}:{record.port} expires in {record.daystogo} days 
+        You are the listed contact for facilitating the renewal of this certificate.
+        Thank-you """
+        logging.debug(f"debug {record.id, record.fqdn, request.method}")
+        data = {
+            "to": record.contacts,
+            "subject": subject,
+            "message_body": message_body,
+            "fromfield": fromfield,
+        }
+        mailform = MailForm3(data)
+        for field in mailform:
+            print(field.name, field.html_name, field.data)
+        logging.debug(f"mailform.is_bound: {mailform.is_bound}")
+        context = {
+            "to": record.contacts,
+            "fromfield": fromfield,
+            "subject": subject,
+            "message_body": message_body,
+            "form": mailform,
+            "id": id,
+            "user": request.user,
+            "role": request.user.get_role_display(),
+        }
+        return render(request, "certs/mailbyhand.html", context)
+    elif request.method == "POST":
+        #logging.debug(f"mailform.is_bound in post sect: {mailform.is_bound}")
+        logging.debug(f"debug we are in request.method == POST")
+        r = request.POST.items()
+        logging.debug(f"request.POST.items = {r}")
+        to = request.POST["to"]
+        logging.debug(f'request.POST["to"] = {to}')
+        subject = request.POST["subject"]
+        message_body = request.POST["message_body"]
+        logging.debug("checking is valid ...")
+        # if using django forms ...
+        if mailform.is_valid():
+            logging.debug(f"mailform.is_bound: {mailform.is_bound}")
+            logging.debug("is valid ...sending")
+            try:
+                logging.debug(f"to is {to}")
+                send_mail(
+                    subject,
+                    message_body,
+                    fromfield,
+                    to,
+                    fail_silently=False,
+                )
+            except:
+                messages.add_message(
+                    request,
+                    messages.WARNING,
+                    f"Could not mail {to} about {subject}!",
+                )
+                context = {
+                    "id": id,
+                    "user": request.user,
+                    "role": request.user.get_role_display(),
+                }
+                logging.debug(f"id = {id}")
+                return HttpResponseRedirect(reverse("certs:detail", kwargs={"id": id}))
+            logging.debug("should have sent email")
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"Mailed!",
+            )
+            logging.debug("setting context")
+            context = {"user": request.user, "role": request.user.get_role_display()}
+            logging.debug("about to call certs:index")
+            return HttpResponseRedirect(reverse("certs:index"))
+        else:
+            messages.add_message(
+                request,
+                messages.WARNING,
+                f"Form input was  not valid!",
+            )
+            logging.debug(f"mailform.errors: {mailform.errors}")
+            context = {
+                "id": id,
+                'form': mailform,
+                "user": request.user,
+                "role": request.user.get_role_display(),
+            }
+            #return HttpResponseRedirect(reverse("certs:detail", kwargs={"id": id}))
+            return render(request,"certs/mailbyhand.html", context)
+    else:
+        context = {
+            "id": id,
+            "user": request.user,
+            "role": request.user.get_role_display(),
+        }
+        return render(request, "certs/mail.html", context)

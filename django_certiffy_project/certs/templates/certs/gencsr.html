@@ -1,0 +1,91 @@
+{% extends 'base.html'%}
+{% block content %}
+<main>
+    <h2>Generate Certificate Signing Request</h2>
+        <div class="col-12 mb-1 mt-1">
+            <form   method="post"
+                    name="csr-form"
+                    formaction="{% url 'certs:gencsr' id %}"
+                    enctype="multipart/form-data">
+                    {% load crispy_forms_tags %}
+                    {% csrf_token %}
+            <table class="col-12">
+                <tr class="col-12">
+                  <th class="col-2">Common Name:</th>
+                     <td class="col-10">
+                            {{form.common_name|as_crispy_field}}
+                            {{form.common_name_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                   <th class="col-2">Country:</th>
+                     <td class="col-10">
+                         {{ form.country_name|as_crispy_field}}
+                            {{form.country_name_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">State/Province: </th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                         {{form.state_or_province_name|as_crispy_field}}
+                         {{form.state_or_province_name_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Organization: </th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                         {{form.organization_name|as_crispy_field}}
+                         {{form.organization_name_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Organizational Unit Name: </th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                         {{form.organizational_unit_name|as_crispy_field}}
+                         {{form.organizational_unit_name_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Locality:</th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                        {{form.locality_name|as_crispy_field}}
+                        {{form.locality_name_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Alternative Names:</th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                        {{form.subject_alternative_name|as_crispy_field}}
+                        {{form.subject_alternative_name_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Email Address:</th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                        {{form.email_address|as_crispy_field}}
+                        {{form.email_address_errors}}
+                      </div>
+                    </td>
+                </tr>
+            <input  type="hidden"  
+                    name="returnid" 
+                    value="{{id}}">
+            </table>
+        <input  type="submit" 
+                class="btn btn-warning" 
+                value="Generate CSR">
+        </form>
+        </div>
+</main>
+{% endblock %}

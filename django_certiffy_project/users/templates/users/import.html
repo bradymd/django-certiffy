@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+<h2>Import Users Record jSON file</h2>
+These files can only be exported from a working Certiffy.<br>
+So they are like backups or for migration.<br>
+You can't delete your admin account before importing as you then won't have permissions.<br>
+You would have to run "python  manage.py  createsuperuser" from the command line to set a new admin account.<p>
+<div class="row">
+    <div class="col-12 mb-1">
+        <!-- Upload form. Note enctype attribute! -->
+        <form   action="{% url "users:importjson" %}" 
+                method="post" 
+                enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ message }}
+            <p>{{ form.non_field_errors }}</p>
+            <p>{{ form.file.label_tag }} {{ form.docfile.help_text }}</p>
+            <p>
+                {{ form.file.errors }}
+                {{ form.file}}
+            </p>
+            <p><input type="submit" class="btn btn-warning"  
+            value="Upload"/></p>
+        </form>
+    </div>
+</main>
+{% endblock %}

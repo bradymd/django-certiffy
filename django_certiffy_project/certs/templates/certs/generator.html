@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content  %}
+<script>
+function copyKeyText() {
+     //select the element with the id "copyMe", must be a text box
+     var textToCopy = document.getElementById("key-copy");
+     //select the text in the text box
+     textToCopy.select();
+     //copy the text to the clipboard
+     document.execCommand("copy");
+}
+function copyCsrText() {
+     //select the element with the id "copyMe", must be a text box
+     var textToCopy = document.getElementById("csr-copy");
+     //select the text in the text box
+     textToCopy.select();
+     //copy the text to the clipboard
+     document.execCommand("copy");
+}
+</script>
+<div  style="max-width: 1600px;margin; 0 auto; padding: 10px;">
+ <div class="container-fluid">
+ <div class="shadow-lg p-3 mt-3 bg-body rounded">
+  <h3>CSR Generator<h3>
+<div class="fs-6">
+    <table>
+        <tr>
+            <td>Common Name:</td><td>{{common_name}}</td>
+        </tr>
+        {% if subject_alternative_name %}
+        <tr>
+            <td>Alternative Names:</td><td>{{subject_alternative_name}}</td>
+        </tr>
+        {% endif %}
+        {% if organization_name %}
+        <tr>
+            <td>Organization:</td><td>{{organization_name}} </td>
+        </tr>
+        {% endif %}
+        {% if organizational_unit_name %}
+        <tr>
+            <td>Organizational Unit Name:</td><td>{{organizational_unit_name}}</td>
+        </tr>
+        {% endif %}
+        {% if state_or_province_name %}
+        <tr>
+            <td>State/Province/Country:</td><td>{{state_or_province_name }}</td>
+        </tr>
+        {% endif %}
+        {% if locality_name %}
+        <tr>
+            <td>Locality/City Name:</td><td>{{locality_name}}</td>
+        </tr>
+        {% endif %}
+        {% if country_name %}
+        <tr>
+            <td>Country Code: </td><td>{{country_name}}</td>
+        </tr>
+        {% endif %}
+    </table> 
+
+    <p>From the CSR created:</br>
+    {% for a in attributes %}
+    {{a}}
+    {% endfor %}
+    <br>
+    {% if sans %}
+    {% for s in sans %}
+    {{s}}
+    {% endfor %}
+    {% endif %}
+
+</div> {# fs-6 #}
+
+            <button onclick="copyKeyText()"  
+                    id="key-btn" 
+                    class="btn btn-primary mb-2">Copy Key</button> 
+            <button onclick="copyCsrText()" 
+                    id="csr-btn" 
+                    class="btn btn-primary mb-2">Copy CSR</button>
+
+            <form class="form-inline">
+              <input  type="hidden" 
+                    id="common_name" 
+                    value="{{common_name}}" 
+                    name="common_name">
+              <input  type="hidden" 
+                    id="pemcsr" 
+                    value="{{pemcsr}}"
+                    name="pemcsr">
+              <input  type="hidden" 
+                    id="pemkey" 
+                    value="{{pemkey}}" 
+                    name="pemkey">
+              <button type="submit" 
+                    class="btn btn-primary mb-2" 
+                    value=""  
+                    formmethod="get" 
+                    formaction="/download_key">download key</button>
+              <button type="submit" 
+                    class="btn btn-primary mb-2" 
+                    value=""  
+                    formmethod="get" 
+                    formaction="/download_csr">download csr</button>
+            </form>
+
+            <div class="row col-12">
+                <table><tr><td>
+            <textarea
+                    id="key-copy" 
+                    class="form-control form-control-sm" 
+                    name="key-copy" 
+                    rows="20"  
+                    readonly>{{pemkey}}</textarea>
+                        </td>
+                        <td>
+            <textarea   id="csr-copy" 
+                        class="form-control form-control-sm" 
+                        name="csr-copy" 
+                        rows="20" 
+                        readonly>{{pemcsr}}</textarea>
+                        </td></tr></table>
+            </div>
+<!--
+            <p>The  full CSR for inspection is:</p>
+<textarea id="csr-output" class="form-control form-control-sm " name="csroutput" rows="10"  readonly>
+
+</textarea>
+-->
+ </div></div></div>
+{% endblock %}
+

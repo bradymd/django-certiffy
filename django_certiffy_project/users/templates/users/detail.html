@@ -1,0 +1,38 @@
+{% extends 'base.html'%}
+{% block content %}
+<div class="main">
+    <h2>User Detail View</h2>
+        <div class="col-12 mb-1 mt-1">
+        <form   name="detail-form"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+        <table>
+            {% for field in form %}
+                    <tr class="col-12">
+                        <div class="fieldWrapper">
+                            <th class="col-4"> {{field.errors}} {{field.label_tag}} </th>
+                        <td clas="col-8">{{field.value}} </td>
+                        </div>
+                    </tr>
+            {% endfor %}
+        </table>
+        </div>
+        <form id="baseform">
+        <button  class="btn btn-warning mb-3 mt-1"
+            method="GET"
+            formaction="{% url 'users:update' id %}"
+            type="submit"
+        >Update</button>
+        <button  class="btn btn-warning mb-3 btn btn-warning mt-1"
+                method="POST"
+                formaction="{% url 'users:delete' id  %}"
+                type="submit"
+        >Delete</button>
+        <button  class="btn btn-warning mb-3 btn btn-warning mt-1"
+                method="POST"
+                formaction="{% url 'users:resetpassword' id  %}"
+                type="submit"
+        >Reset Password</button>
+        </form>
+
+{% endblock %}

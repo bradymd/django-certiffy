@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+    <style>
+.slidecontainer {
+  width: 80%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #04AA6D;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #04AA6D;
+  cursor: pointer;
+}
+</style>
+
+         <div class="mb-2 mt-2" style="display: flex; flex-direction: row;">
+            <div id="chart1" name="chart1"></div>
+        </div>
+
+        <form method="get"
+              action="{% url 'certs:graphs' %}">
+            <!-- <input  type="range" min="-7" 
+                    max="372" value="15" 
+                    class="slider" 
+                    name="viewing_window"
+                    id="viewing_window">
+            -->
+               <div class="slidecontainer">
+                  <span id="slidervalue"></span> day window
+                  <input    type="range" 
+                            min="-7" 
+                            max="372" 
+                            value="{{viewing_window}}"
+                            class="slider" 
+                            id="viewing_window"
+                            name="viewing_window"> 
+                </div>
+            <button type="submit" 
+                    name="action" 
+                    class="btn btn-primary me-2">view</button>
+            <button     type="submit" 
+                        value="{{default_viewing_window}}" 
+                        id="viewing_window"
+                        name="viewing_window"
+                        class="btn btn-primary me-2">reset</button>
+        </form>
+        </div>
+            </td></tr>
+    </table>
+
+<script>
+    var slider = document.getElementById("viewing_window");
+    var output = document.getElementById("slidervalue");
+    output.innerHTML = slider.value; // Display the default slider value
+    // Update the current slider value (each time you drag the slider handle)
+    slider.oninput = function() {
+        output.innerHTML = this.value;
+    }
+</script>
+</main>
+{% endblock %}
+

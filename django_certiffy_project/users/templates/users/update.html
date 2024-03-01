@@ -1,0 +1,45 @@
+{% extends 'base.html'%}
+{% block content %}
+<main>
+<h2>Update View</h2>
+<div class="row"
+  <div class="col-12 mb-1 mt-1">
+    <form   id="update"
+            method="POST" 
+            name="update"
+            formaction="{% url 'users:update' id %}"
+            enctype="multipart/form-data">
+        {% load crispy_forms_tags %}
+        {% csrf_token %}
+        <table>
+            {% for field in form %}
+                    <tr class="col-12"> 
+                        <div class="fieldWrapper">
+                          {% if field.label == "Password" %}
+                           {{ field.as_hidden }}
+                           {% else %}
+                          <th class="col-4"> {{field.errors}} {{field.label_tag}} </th> 
+                          <td clas="col-8"> {{field|as_crispy_field}} </td>
+                           {% endif %}
+                        </div>
+                    </tr>
+           {% endfor %}
+        </table>
+        <button type="submit"
+                method="POST"
+                class="btn btn-warning mt-1"
+                value="Update">Update</button>
+        <button  type="submit"
+                formaction="{% url 'users:delete' id %}"
+                class="btn btn-danger mt-1"
+                value="Delete">Delete</button>
+        <button  type="submit"
+                formaction="{% url 'users:index'  %}"
+                type="submit"
+                class="btn btn-danger mt-1"
+                value="Cancel">Cancel</button>
+    </form>
+ </div> <!-- col-->
+</div> <!-- row -->
+</main>
+{% endblock %}

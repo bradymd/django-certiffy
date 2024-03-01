@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<div class="row">
+    <div class="col-sm-2">
+            <button 
+                {% if user.role == 'USER' and not user.is_superuser %}
+                disabled=True
+                {% endif %}
+                type="submit" 
+                class="btn btn-primary"
+                formaction="{% url 'users:register' %}"
+                method='POST'
+                >Create User</button>
+    </div>
+</div>

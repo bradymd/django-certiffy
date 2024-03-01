@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+<h2>Export Certificate Record CSV file</h2>
+<div class="row">
+    <div class="col-12 mb-1">
+        <form   action="{% url "certs:exportcsv" %}" 
+                method="post" 
+                xenctype="multipart/form-data">
+            {% csrf_token %}
+            <label name="file"> Filename to export to:
+            <input type="text" id="file" name="file" placeholder="exportcsv.csv">
+            <button type="submit" class="btn btn-warning">Export</button>
+        </form>
+    </div>
+</main>
+{% endblock %}

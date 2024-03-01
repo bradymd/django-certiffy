@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+<h2>Import Certificate Record CSV file</h2>
+You can prepare a file with three fields.<br>
+This is suitable when sites have never been in the system before eg.<br>
+<code> 
+    example.com,443,my@email.com
+</code>
+</p>
+<p>
+Or you can bring in files you have previously exported with the full 8 fields.</p>
+<p>The fields are:<br>
+<strong>fqdn,port,daystogo,contacts,grade,expiry_date,status,notes</strong><br>
+eg<br>
+<code>
+hs-system-staging.herts.ac.uk,443,294,"my@email,your@mail.com",N,2024-09-07 23:59:59+00:00,UP,"my notes"</li>
+</code>
+</p>
+<p>It does alot of error checking so rejects duplicates, lines with not enough or too many fields or bad data.</p>
+<div class="row">
+    <div class="col-12 mb-1">
+        <!-- Upload form. Note enctype attribute! -->
+        <form   action="{% url "certs:importcsv" %}" 
+                method="post" 
+                enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ message }}
+            <p>{{ form.non_field_errors }}</p>
+            <p>{{ form.file.label_tag }} {{ form.docfile.help_text }}</p>
+            <p>
+                {{ form.file.errors }}
+                {{ form.file}}
+            </p>
+            <p><input type="submit" class="btn btn-warning"  
+            value="Upload"/></p>
+        </form>
+    </div>
+</main>
+{% endblock %}

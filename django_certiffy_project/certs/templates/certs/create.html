@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+<h2>Create Certifcate Record</h2>
+    <div class="col-12">
+            <form   
+                {% load crispy_forms_tags %}
+                method="POST"  
+                name="create"
+                >
+                {% csrf_token %}
+                <table class="col-10 mb-1 mt-1">
+                    {% for field in form %}
+                        <tr class="row"> 
+                            <div class="fieldWrapper"">
+                               <th class="col-3"> {{field.errors}} {{field.label_tag}}</th> 
+                               <td class="col-7"> {{field|as_crispy_field}} 
+                                  {% if xfield.help_text %}<div class="help fst-italic">{{ field.help_text|safe }}</div>
+                                  {% endif %}
+                                </td>
+                            </div>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <input type="submit" class="btn btn-warning" value="Create">
+        </form>
+        </div>
+</main>
+{% endblock %}

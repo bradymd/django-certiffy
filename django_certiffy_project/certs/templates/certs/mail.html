@@ -1,0 +1,60 @@
+{% extends 'base.html'%}
+{% block content %}
+<main>
+    <h2>Mail Contact</h2>
+        <div class="col-12 mb-1 mt-1">
+            <form   method="post"
+                    name="mailbyhand-form"
+                    formaction="{% url 'certs:mail' id %}"
+                    enctype="multipart/form-data">
+                    {% load crispy_forms_tags %}
+                    {% csrf_token %}
+            <table class="col-12">
+                <tr class="col-12">
+                  <th class="col-2">To:</th>
+                     <td class="col-10">
+                            {{form.to|as_crispy_field}}
+                            {{form.to_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                   <th class="col-2">From:</th>
+                     <td class="col-10">
+                         {{ form.fromfield|as_crispy_field}}
+                            {{form.fromfield_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Subject: </th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                         {{form.subject|as_crispy_field}}
+                         {{form.subject_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2">Message:</th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                        {{form.message_body|as_crispy_field}}
+                        {{form.message_body_errors}}
+                      </div>
+                    </td>
+                </tr>
+            <input  type="hidden"  
+                    name="returnid" 
+                    value="{{id}}">
+            </table>
+        <input  type="submit" 
+                class="btn btn-warning" 
+                value="Mail Contact">
+        </form>
+        </div>
+        <b>Notes For Reference:</b>
+        <textarea id="notes" 
+                  class="form-control form-control-sm " 
+                  name="notes" rows="10"  
+                  readonly>{{notes}}</textarea>
+</main>
+{% endblock %}

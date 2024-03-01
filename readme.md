@@ -25,11 +25,13 @@ rm db.sqlite3
 ```
 
 ## CONFIGURE THE DATABASE
+```
 #rm -rf  certs/migrations
 #rm -rf  users/migrations
 python manage.py  makemigrations
 python manage.py migrate --fake-initial
 python manage.py migrate --run-syncdb
+```
 
 
 ## CREATE THE ADMIN USER
@@ -38,7 +40,8 @@ DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw \
     python manage.py createsuperuser --email=admin@example.com --noinput
 ```
 
-BUG: this first user is put in Group "USER" which prevents it creating additional users.
+
+BUG: this first user is put in Group "USER" which prevents it creating additional users.\\
 WORKAROUND: use the tab django-admin to change the Role to "ADMIN"
 
 

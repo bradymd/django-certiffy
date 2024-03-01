@@ -1,0 +1,10 @@
+venv/
+django_certiffy_project/imported.json
+*/db.sqlite3
+django_certiffy_project/*/migrations/*
+*/imported.csv
+*.pyc
+*/*.pyc
+*/*/*.pyc
+*/*/*/*.pyc
+*/*/*/*/*.pyc

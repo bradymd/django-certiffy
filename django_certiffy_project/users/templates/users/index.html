@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+    {% for field in forms %}
+    {{field.tag_label}} {{ field.value }}
+    {% endfor %}
+    <form   name="searchform"
+            action="{% url 'users:search' %}"
+            method="get"
+    />
+    <div class="row">
+      <div class="col-sm-1">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div> <!-- class="col"-->
+      <div class="col-sm-3 mb-3">
+         <input  
+            type="text"
+            name="username"
+            class="form-control"
+            placeholder=" username "
+            size="5"
+            maxlength="80"/>
+      </div> <!-- class="col" -->
+    </form>
+    <table class="table">
+        <thread>
+            <tr>
+                <th>Username</th>
+                <th>Email&nbsp;</th>
+                <th>First Name&nbsp;</th>
+                <th>Last Name&nbsp;</th>
+                <th>Role</th>
+            </tr>
+        </thread>
+        <tbody>
+        {% for user in user_list %}
+        <tr>
+            <td>
+             <a href="/users/detail/{{user.id}}">{{ user.username}}</a>
+            </td>
+            <td> {{user.email}} </td>
+            <td> {{user.first_name}} </td>
+            <td> {{user.last_name}} </td>
+            <td>{{ user.role }}
+            {% if user.is_staff %} django-staff
+            {% endif %}
+            {% if user.is_superuser %} django-su 
+            {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="mb-2 mt-2" style="display: flex; flex-direction: row;">
+        <form
+            action="{% url 'users:importjson' %}" method="post" />
+            <button
+                type="submit"
+                {% if user.role == "ADMIN" and not user.is_superuser %} disabled {% endif %}
+                class="btn btn-primary me-2">Import</button>
+        </form>
+        <form
+            action="{% url 'users:exportjson' %}" method="get" />
+            <button
+                type="submit"
+                {% if user.role == "ADMIN" and not user.is_superuser %} disabled {% endif %}
+                class="btn btn-primary me-2 ">Export</button>
+         </form>
+        <form
+                action="{% url 'users:deleteall' %}" method="POST" /> 
+            <button
+                type="submit"
+                {% if  not  user.is_superuser  %} disabled {% endif %}
+                class="btn btn-warning me-2 ">Delete All</button>
+         </form>
+    </div>
+
+{% include 'users/footplate.html' %}
+</main>
+{% endblock %}

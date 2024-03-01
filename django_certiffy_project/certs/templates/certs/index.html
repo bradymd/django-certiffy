@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<main>
+     <div style="display: flex; flex-direction: row; padding:0 0px;">
+            <form   name="searchform" 
+                    action="{% url 'certs:search' %}" method="get" />
+                    <input  
+                        type="text"
+                        name="fqdn"
+                        placeholder="hostname eg example.com"
+                        size=30
+                        maxlength="80"/>
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary me-5">Search</button>
+            </form>
+            <form   action="{% url 'certs:graphs' %}" method="get" />
+                    <button 
+                        type="submit" 
+                        action="{% url 'certs:graphs' %}"
+                        class="btn btn-primary me-2">Graph</button>
+            </form>
+            <form
+                    action="{% url 'certs:recalculate_all' %}" 
+                    method="get" />
+                     <button 
+                        type="submit" 
+                        class="btn btn-primary me-2" 
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="tries to contact and re-calculates" >Recalculate Daystogo (All)</button>
+            </form>
+            <form
+                    action="{% url 'certs:mail_all' %}" 
+                    method="POST" />
+                    {% csrf_token %}
+                     <button 
+                        type="submit" 
+                        class="btn btn-primary me-2" 
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="Trigger Mail" >Trigger Mailing</button>
+            </form>
+            <form
+                    action="{% url 'certs:create' %}" 
+                    method="get" />
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary me-2">Create</button>
+            </form>
+     </div>
+     <table class="table">
+        <thread>
+            <tr>
+                <th>Days2Go</th>
+                <th>Hostname <font class="fw-lighter">(contacts)</font></th>
+                <th>Port&nbsp;</th>
+                <th>Expiry</th> 
+                <th>Grade</th> 
+            </tr>
+        </thread>
+        <tbody>
+        {% for cert in cert_list %}
+        <tr>
+            <td>{{ cert.daystogo }}</td>
+            <td>
+                {% if cert.status == "DOWN" %}
+                    <font class="text-danger">!</font>
+                {% endif %}
+                <a 
+                    {% if cert.daystogo <= daystogo_warning and cert.daystogo > 1 %}
+                    class="text-warning"
+                    {% endif %}
+                    {% if cert.daystogo <= 1 %}
+                    class="bg-danger text-white"
+                    {% endif %}
+                    href="/detail/{{cert.id}}">{{cert.fqdn}}</a>
+                (
+                {% for c in cert.contacts %}
+                    <font class="fs-6 fw-lighter">{{c}}</font>
+                {% endfor %}
+                    )
+            </td>
+            <td> {{cert.port}} </td>
+            <td>{{ cert.expiry_date }}</td>
+            <td>{{ cert.grade}}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="mb-2 mt-2" style="display: flex; flex-direction: row;">
+        <form
+            action="{% url 'certs:importcsv' %}" method="get" />
+            <button 
+                type="submit" 
+                class="btn btn-primary me-2">Import</button>
+        </form>
+        <form
+            action="{% url 'certs:exportcsv' %}" method="get" />
+            <button 
+                type="submit" 
+                class="btn btn-primary me-2 ">Export</button>
+         </form>
+        <form
+            action="{% url 'certs:deleteall' %}" method="get" />
+            <button 
+                type="submit" 
+                class="btn btn-warning me-2 ">Delete All</button>
+         </form>
+    </div>
+</main>
+{% endblock %}
+

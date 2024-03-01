@@ -1,0 +1,104 @@
+{% extends 'base.html'%}
+{% block content %}
+<main>
+    <h2>Settings</h2>
+        <div class="col-12 mb-1 mt-1">
+            <form   method="post"
+                    name="settings-form"
+                    formaction="{% url 'certs:settings'  %}"
+                    enctype="multipart/form-data">
+                    {% load crispy_forms_tags %}
+                    {% csrf_token %}
+            <table class="col-12">
+                <tr class="col-12">
+                  <th class="col-2 align-top">SMTP</th>
+                     <td class="col-10">
+                            {{form.smtp|as_crispy_field}}
+                            {{form.smtp_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                   <th class="col-2 align-top">Default From:</th>
+                     <td class="col-10">
+                         {{ form.default_from_field|as_crispy_field}}
+                            {{form.default_from_field_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                   <th class="col-2 align-top">Default Subject:</th>
+                     <td class="col-10">
+                         {{ form.default_subject|as_crispy_field}}
+                            {{form.default_subject_errors}}
+                     </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2 align-top">Mail Template:</th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                         {{form.default_mail_template|as_crispy_field}}
+                         {{form.default_mail_template_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2 align-top">Enable Cron Mailing:</th>
+                    <td class="col-10">
+                      <div class="fieldWrapper">
+                         {{form.cron_mail|as_crispy_field}}
+                         {{form.cron_mail_template_errors}}
+                      </div>
+                    </td>
+                </tr>
+                <tr class="col-12">
+                  <th class="col-2 align-top">Days:</th>
+                    <td class="col-2">
+                          Sun: {{form.Sun}}
+                          Mon:{{form.Mon}} Tue:{{form.Tue}}
+                          Wed: {{form.Wed}} Thu:{{form.Thu}} Fri:{{form.Fri}}
+                          Sat: {{form.Sat}} 
+                    </td>
+                </tr>
+                <tr class="col-12">
+                    <th class="col-2 align-top">Scheduled Hour:</th>
+                      <td class="col-2">
+                          <div class="fieldWrapper">
+                              {{form.scheduled_hour|as_crispy_field}}
+                          </div>
+                      </td>
+                </tr>
+                <tr class="col-12">
+                    <th class="col-2 align-top">Days to go Warning:</th>
+                      <td class="col-2">
+                          <div class="fieldWrapper">
+                              {{form.daystogo_warning|as_crispy_field}}
+                          </div>
+                      </td>
+                </tr>
+                <tr class="col-12">
+                    <th class="col-2 align-top">Viewing Window:</th>
+                      <td class="col-2">
+                          <div class="fieldWrapper">
+                              {{form.viewing_window|as_crispy_field}}
+                          </div>
+                      </td>
+                </tr>
+
+            </table>
+        <input  type="submit" 
+                class="btn btn-warning" 
+                value="Update Settings">
+        </form>
+        {% if cronjobs %}
+        These are the application cron jobs :<br>
+        <i>
+            {% for job in cronjobs %}
+                {{ job }}</br>
+            {% endfor %}
+        </i>
+        </p>
+        scripts.cron.cron runs hourly to check the scheduled hour for mailing.<br>
+        scripts.recalculate_all.recalculate_all should run at least once a day but is run also  before mailing<br>
+        {% endif %}
+        </div>
+</main>
+{% endblock %}
