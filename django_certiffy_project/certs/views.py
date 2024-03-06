@@ -881,14 +881,17 @@ of pandas. Pass `(name,)` instead of `name` to silence this warning.
 
     earliest  = int ( df.iloc[0]['daystogo'] -1 )
     logging.debug(f'earliest={earliest}')
+    if  earliest > viewing_window:
+        viewing_window = earliest   + 7
+
     fig.update_xaxes(range=[earliest, viewing_window +0.5  ])
     if viewing_window > 15 and viewing_window < 30:
         dtickvalue=7
     elif viewing_window > 30:
-        dtickvalue=30
+        dtickvalue=int(viewing_window/30)
     else:
         dtickvalue=1
-
+    logging.debug(f'dtickvalue={dtickvalue}')
     fig.add_vline(  x=warning_daystogo_yaxis, 
                     line_width=3, 
                     line_dash="dash", 
@@ -955,6 +958,7 @@ of pandas. Pass `(name,)` instead of `name` to silence this warning.
     fig.update_layout(modebar_remove="zoomin,zoomout,pan,lasso",plot_bgcolor="lavender")
     figJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
+    logging.debug(f'viewing_window{viewing_window}')
     context = { 'figJSON':figJSON, 
                 'viewing_window': viewing_window,
                 'default_viewing_window': default_viewing_window,
