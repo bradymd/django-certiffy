@@ -39,7 +39,7 @@ python manage.py migrate --run-syncdb
 DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python manage.py createsuperuser --email=admin@example.com --noinput
 ```
 
-BUG: The first user"admin"  is put as Group "USER".\\
+BUG: The first user"admin"  is put as Group "USER".\
 WORKAROUND: use the tab django-admin to change the Role to "ADMIN"
 
 
@@ -62,7 +62,7 @@ sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy
 ```
 
 # ODD THING ABOUT GROUPS
-The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.\\
+The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.
 This doesn't apply if you create a User and then UPDATE it to have the second group.
 
 ## RUN GUNICORN TO RUN IN PRODUCTION
