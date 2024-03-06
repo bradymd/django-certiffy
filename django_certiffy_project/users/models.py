@@ -7,6 +7,6 @@ class MyUser(AbstractUser):
     role= models.CharField(
            max_length=10, 
            choices=ROLES,
-           default="USER", 
+           default="ADMIN", 
            blank=True
            )

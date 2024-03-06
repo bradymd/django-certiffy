@@ -1,4 +1,4 @@
-git clone git@github.com:bradymd/django-certiffy.git
+git clone https://github.com/bradymd/django-certiffy.git
 cd django-certiffy
 python3 -m venv venv && source venv/bin/activate
 cd django_certiffy_project

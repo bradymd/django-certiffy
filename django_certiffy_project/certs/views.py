@@ -124,7 +124,7 @@ def create(request):
             context = {"form": CertificateForm(request.POST)}
             return render(request, "certs/create.html", context)
     else:
-        context = {"form": CertificateForm()}
+        context = { "form": CertificateForm() }
         return render(request, "certs/create.html", context)
 
 

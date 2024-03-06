@@ -38,7 +38,6 @@ class Certificate(models.Model):
             )
     contacts = ListCharField(
             max_length=254, 
-            default="m.brady@herts.ac.uk", 
             help_text="(comma separated email addresses)",
             base_field=models.EmailField(
                 max_length=254,
@@ -82,7 +81,7 @@ class Certificate(models.Model):
 class Mail(models.Model):
     to = ListCharField(
             max_length=254, 
-            default="m.brady@herts.ac.uk", 
+            default="admin@example.com", 
             help_text="(comma separated email addresses)",
             base_field=models.EmailField(
                 max_length=254,
@@ -92,7 +91,7 @@ class Mail(models.Model):
         max_length=254,
         null=False,
         blank=False,
-        default="m.brady@herts.ac.uk",
+        default="admin@example.com",
         help_text="(Readonly. This is associated with your user record)",
         verbose_name="From:",
     )
