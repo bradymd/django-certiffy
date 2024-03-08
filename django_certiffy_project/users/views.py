@@ -504,7 +504,12 @@ def importjson(request):
           import io
           f = io.StringIO()
           with redirect_stdout(f):
-            management.call_command("loaddata", file, stdout=f)
+              try:
+                management.call_command("loaddata", file, stdout=f)
+              except Exception as e:
+                logging.debug(f'Error in management.call_command {e}')
+                output=f"Problem: {e}"
+                return output
           output = f.getvalue()
           return output
       context = {
@@ -518,12 +523,18 @@ def importjson(request):
           # upload the a file and leave it in imported.json
           handle_uploaded_file(request.FILES['file'])
           output=load_table("imported.json")
-          print('help')
-          messages.add_message(
-                request,
-                messages.SUCCESS,
-                f"Success!",
-            )
+          if "Problem" in output:
+                messages.add_message(
+                    request,
+                    messages.WARNING,
+                    f"Failed to load.  {output}",
+                )
+          else:
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Success",
+                )
           return HttpResponseRedirect(reverse("users:index"))
         else:
           messages.add_message(

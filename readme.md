@@ -134,3 +134,21 @@ python manage.py crontab add
 python manage.py crontab add
 python manage.py crontab show
 ```
+
+
+# FOREIGN KEY contraint - ISSUE IMPORTING USERS
+The export of the users table to a json file will have an integer representing the group \"USER\" and \"ADMIN\".  
+On a new install these will be  \"1\" and \"2\".   
+On   some older certiffy systems I\'ve seen \"8\" and \"9\".   
+Anyway, this can stop it being imported and you can get the error \'FOREIGN KEY constraint failed\'.   
+You can use vim to:
+```
+s/\[8]/\[1]/g  
+s/\[9]/\[2]/g  
+```
+You can import on the command line:
+```
+python manage.py loaddata imported.json
+```
+
+
