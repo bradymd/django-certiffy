@@ -3,6 +3,9 @@
 sh deploy.sh
 ```
 
+Take a look ![Screenshots](screenshots.md)
+
+
 ## BUILD FOR PRODUCTION THOUGHTFULLY
 ```
 cd /var/www
