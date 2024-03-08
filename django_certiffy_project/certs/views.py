@@ -956,7 +956,6 @@ of pandas. Pass `(name,)` instead of `name` to silence this warning.
     fig.update_layout(modebar_remove="zoomin,zoomout,pan,lasso",plot_bgcolor="lavender")
     figJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-    logging.debug(f'debug: viewing_window{viewing_window}')
     context = { 'figJSON':figJSON, 
                 'viewing_window': viewing_window,
                 'default_viewing_window': default_viewing_window,

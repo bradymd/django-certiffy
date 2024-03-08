@@ -9,7 +9,7 @@
                 xenctype="multipart/form-data">
             {% csrf_token %}
             <label name="file"> Filename to export to:
-            <input type="text" id="file" name="file" placeholder="exportcsv.csv">
+            <input type="text" id="file" name="file" value="certiffy-certs-export.csv" placeholder="certiffy-certs-export.csv">
             <button type="submit" class="btn btn-warning">Export</button>
         </form>
     </div>
