@@ -180,7 +180,6 @@ class Settings(models.Model):
         max_length=254,
         null=False,
         blank=False,
-        default="m.brady@herts.ac.uk",
         help_text="(Readonly. This is associated with your user record)",
         verbose_name="From:",
     )
@@ -188,7 +187,7 @@ class Settings(models.Model):
             max_length=254, 
             null=False,
             blank=False,
-            default="{{FQDN}}:{{PORT}} Certificate Expiry {{DAYSTOGO}} days",
+            default="({{DAYSTOGO}} days) {{FQDN}}:{{PORT}} Certificate Expiry",
             help_text="To reset to default use {{DEFAULT}}",
                 )
     default_mail_template= models.TextField(
