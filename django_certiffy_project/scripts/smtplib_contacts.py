@@ -43,7 +43,7 @@ except:
     MAIL_CONTACT_IF_LESS_THAN=5
 
 #This is just for development
-mail=False
+mail=True
 
 helpmessage="""NAME:
    mail-contacts.py
@@ -56,7 +56,7 @@ SYNOPSIS:
    
 USAGE:
   source ~/.venv/certiffy/bin/activate
-  mail-contcts.py [  [ --nomail ]  --from-command-line |  --help  
+  mail-contacts.py [  [ --nomail ]  --from-command-line |  --help  
 AUTHOR: m.brady@herts.ac.uk"""
 
 options=""
@@ -84,9 +84,8 @@ for name, value in options:
 
 def mail_warning(contacts, fqdn, daystogo,expiry_date,port):
     if mail == False:
-        print(f'didnt mail {contacts} about {fqdn},{port}')
+        logging.debug(f'didnt mail {contacts} about {fqdn},{port}')
         pass
-        #return
     settings = Settings.objects.all().first()
     to = contacts
     fromfield = settings.default_from_field
@@ -157,7 +156,7 @@ def mail_warning(contacts, fqdn, daystogo,expiry_date,port):
 
 def mail_contacts():
     records = Certificate.objects.order_by("-daystogo")
-    logging.debug(f'MAIL_CONTACT_IF_LESS_THAN = {MAIL_CONTACT_IF_LESS_THAN}')
+    logging.debug(f'debug MAIL_CONTACT_IF_LESS_THAN = {MAIL_CONTACT_IF_LESS_THAN}')
     for website in records:
         if website.daystogo < MAIL_CONTACT_IF_LESS_THAN:
             logging.debug(f'mailing {website.contacts} about {website.fqdn}')
