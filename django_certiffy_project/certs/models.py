@@ -16,6 +16,7 @@ class Certificate(models.Model):
         ("B", "B"),
         ("C", "C"),
         ("F", "F"),
+        ("T", "T"),
         ("N", "NONE"),
     )
     STATUS = (
