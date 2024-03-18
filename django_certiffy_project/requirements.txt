@@ -6,7 +6,7 @@ charset-normalizer==3.2.0
 click==8.1.7
 crispy-bootstrap5==2023.10
 cryptography
-Django==4.2.4
+Django==4.2.11
 django-crispy-forms==2.1
 django-crontab==0.7.1
 django-extensions==3.2.3
@@ -36,4 +36,4 @@ tenacity==8.2.3
 tomli==2.0.1
 typing_extensions==4.7.1
 tzdata==2023.4
-urllib3==2.0.4
+urllib3==2.0.7
