@@ -792,7 +792,7 @@ def graphs(request):
         if cert.expiry_date == "update daystogo":
            cert.expiry_date = "Jan 1 00:00:00 1976 GMT"
         cert_full_expiry_date  = cert.expiry_date
-        cert_full_expiry_date_for_graph = cert.expiry_date.strftime('%A %H:%M  %Y-%m-%d')
+        cert_full_expiry_date_for_graph = cert.expiry_date.strftime('%H:%M  %Y-%m-%d %Z')
         #cert_expiry_date_for_graph =cert.expiry_date.strftime('%b %d %Y')
         cert_shortname=cert.fqdn.split('.')
         display_these.append([  cert.fqdn,

@@ -56,7 +56,7 @@
                 <th>Hostname <font class="fw-lighter">(contacts)</font></th>
                 <th>Port&nbsp;</th>
                 <th>Expiry</th> 
-                <th>&sup*Grade</th> 
+                <th><sup>*</sup>Grade</th> 
             </tr>
         </thread>
         <tbody>
@@ -82,7 +82,7 @@
                     )
             </td>
             <td> {{cert.port}} </td>
-            <td>{{ cert.expiry_date }}</td>
+            <td>{{ cert.expiry_date|date:"d-M-Y  H:i T"  }}</td>
             <td>{{ cert.grade}}</td>
         </tr>
         {% endfor %}
@@ -108,6 +108,7 @@
                 class="btn btn-warning me-2 ">Delete All</button>
          </form>
     </div>
+{% include 'copyright.html'%}
 </main>
 {% endblock %}
 
