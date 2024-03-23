@@ -53,7 +53,7 @@
     </table>
     <div class="mb-2 mt-2" style="display: flex; flex-direction: row;">
         <form
-            action="{% url 'users:importjson' %}" method="post" />
+            action="{% url 'users:importjson' %}" method="get" />
             <button
                 type="submit"
                 {% if user.role == "ADMIN" and not user.is_superuser %} disabled {% endif %}

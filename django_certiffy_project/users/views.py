@@ -355,7 +355,8 @@ def resetpassword(request,id):
             }
             return render(request, "users/resetpassword.html", context)
 
-
+'''
+THIS NEEDS REMOVING NOW
 @login_required
 @permission_required("users.view_user")
 @permission_required("users.add_user")
@@ -452,6 +453,8 @@ def importcsv(request):
     context.update({"form": form})
     return render(request, "certs/import.html", context)
 
+THIS IS OLD CODE
+''' and None
 
 @login_required
 @csrf_exempt
@@ -470,7 +473,6 @@ def exportjson(request):
           output = f.getvalue()
           return output
 
-      logging.debug(' did we get here ' )
       if request.POST:
           filename = request.POST.get("file")
           # the csv file cant get the encrypted fields so is not a full dump
@@ -549,7 +551,7 @@ def importjson(request):
             "role": request.user.get_role_display(),
             "form": UploadFileForm(),
            }
-        return HttpResponseRedirect( "users/import.html", context)
+        return render(request, "users/import.html", context)
 
 @login_required
 @csrf_exempt
