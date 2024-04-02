@@ -12,7 +12,6 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import MyUser
-from .modules.download_csv import download_csv
 from .forms import  (RegistrationForm, 
                      UserUpdateForm, 
                      MyPasswordChangeForm, 
@@ -355,106 +354,6 @@ def resetpassword(request,id):
             }
             return render(request, "users/resetpassword.html", context)
 
-'''
-THIS NEEDS REMOVING NOW
-@login_required
-@permission_required("users.view_user")
-@permission_required("users.add_user")
-@permission_required("users.delete_user")
-@permission_required("users.change_user")
-def importcsv(request):
-    context = {
-        "user": request.user,
-        "role": request.user.get_role_display(),
-    }
-    if request.method == "POST":
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # upload the a file and leave it in imported.csv
-            handle_uploaded_file(request.FILES["file"])
-            reader = csv.reader(open("imported.csv"))
-            # now validate each line using CertificateForm
-            for row in reader:
-                message = ""
-                if len(row) == 0:
-                    continue
-                if len(row) != 3 and len(row) != 8:
-                    message = (
-                        message
-                        + f"{len(row)} fields  should be 3 or 8<br>: {row[0]}..."
-                    )
-                    messages.add_message(request, messages.WARNING, mark_safe(message))
-                    continue
-                if len(row) == 3:
-                    fqdn, port, contacts = row
-                    formparams = {
-                        "fqdn": fqdn,
-                        "port": port,
-                        "contacts": contacts,
-                        "daystogo": 0,
-                        "grade": "N",
-                        "status": "NK",
-                    }
-                if len(row) == 8:
-                    fqdn, port, daystogo, contacts, grade, expiry_date, status, notes = row
-                    formparams = {
-                        "fqdn": fqdn,
-                        "port": port,
-                        "daystogo": daystogo,
-                        "contacts": contacts,
-                        "grade": grade,
-                        "expiry_date": expiry_date,
-                        "status": status,
-                        "notes": notes
-                    }
-                f = CertificateFormForImport(formparams)
-                try:
-                    f.is_valid()
-                    f.save()
-                except IntegrityError as e:
-                    # this isnt working, though the unique constraint is being enforced  from the model
-                    if "unique constraint".lower() in str(e.args).lower():
-                        message = str(e.args[0]) + "Duplicate error"
-                except Exception as e:
-                    # a second way to see if we have a duplicate
-                    if port.isdigit():
-                        if Certificate.objects.filter(
-                            fqdn__iexact=fqdn, port__iexact=port
-                        ):
-                            message = (
-                                message
-                                + str(e.args[0])
-                                + f"<br><b>{fqdn}:{port} Duplicate error</b><br>"
-                            )
-                            messages.add_message(
-                                request, messages.WARNING, mark_safe(message)
-                            )
-                            continue
-                    else:
-                        message = (
-                            message
-                            + f"Could not import {fqdn},{port},{contacts}, {port} <b>is not a digit</b><br>"
-                        )
-                        messages.add_message(
-                            request, messages.WARNING, mark_safe(message)
-                        )
-                        continue
-                    message = message + f"Could not import {fqdn},{port},{contacts}<br>"
-                    for field in f:
-                        for error in field.errors:
-                            message = message + f"<br><b>{field.label}:</b> {error}"
-                    messages.add_message(request, messages.WARNING, mark_safe(message))
-            return HttpResponseRedirect(reverse("certs:index"))
-        else:
-            message = "Failed to get that file"
-            messages.add_message(request, messages.WARNING, mark_safe(message))
-    else:
-        form = UploadFileForm()
-    context.update({"form": form})
-    return render(request, "certs/import.html", context)
-
-THIS IS OLD CODE
-''' and None
 
 @login_required
 @csrf_exempt
