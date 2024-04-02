@@ -126,7 +126,7 @@ SSLCertificateKeyFile /etc/pki/tls/private/certiffy2023.key
 </VirtualHost>
 ```
 
-# TO FACILIATE MAILING CONTACTS AND AUTO CHECKING, SET UP CRON
+# TO FACILITATE MAILING CONTACTS AND AUTO CHECKING, SET UP CRON
 Run crontab add twice:
 ```
 python3 manage.py crontab add
