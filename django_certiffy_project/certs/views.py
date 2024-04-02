@@ -40,6 +40,7 @@ import smtplib,ssl
 from scripts.smtplib_contacts import mail_contacts
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from users.modules.create_groups import create_groups
 
 import logging
 logging.basicConfig(level=logging.WARN,format='%(process)-%(levelname)s-%(message)s')
@@ -51,6 +52,8 @@ def index(request):
     q=Certificate.objects.all()
     s=Settings.objects.all().first()
     if s == None:
+	# This should logically be attempted once on installation
+        create_groups()
         return HttpResponseRedirect(reverse("certs:settings"))
     queryset = reversed(q.order_by("-daystogo"))
     context = {

@@ -7,5 +7,5 @@ python3 -m pip install --upgrade pip
 rm db.sqlite3 
 python3 manage.py migrate --fake-initial
 python3 manage.py migrate --run-syncdb
-DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python manage.py createsuperuser --email=admin@example.com --noinput
+DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python3 manage.py createsuperuser --email=admin@example.com --noinput
 python3 manage.py runserver 
