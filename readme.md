@@ -32,14 +32,14 @@ rm db.sqlite3
 
 ## CONFIGURE THE DATABASE
 ```
-python manage.py migrate --fake-initial
-python manage.py migrate --run-syncdb
+python3 manage.py migrate --fake-initial
+python3 manage.py migrate --run-syncdb
 ```
 
 
 ## CREATE THE ADMIN USER
 ```
-DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python manage.py createsuperuser --email=admin@example.com --noinput
+DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_PASSWORD=psw  python3 manage.py createsuperuser --email=admin@example.com --noinput
 ```
 
 BUG: The first user"admin"  is put as Group "USER".\
@@ -48,7 +48,7 @@ WORKAROUND: use the tab django-admin to change the Role to "ADMIN"
 
 ## TEST RUN IN DEBUG MODE
 ```
-python manage.py runserver :8443
+python3 manage.py runserver :8443
 ```
 After login it should go to the "settings" page  to create the settings table, check the form and "update settings".
 
@@ -63,10 +63,6 @@ firewall-cmd --reload
 HOSTNAME="$(hostname)"
 sed -e 's/ALLOWED_HOSTS.*/ALLOWED_HOSTS = [ "'$HOSTNAME'" ]/' -i django_certiffy_project/django_certiffy_project/settings.py
 ```
-
-# ODD THING ABOUT GROUPS
-The Groups '[ "ADMIN", "USER" ] get put in when users in those groups are CREATED.
-This doesn't apply if you create a User and then UPDATE it to have the second group.
 
 ## RUN GUNICORN TO RUN IN PRODUCTION
 ```
@@ -133,25 +129,7 @@ SSLCertificateKeyFile /etc/pki/tls/private/certiffy2023.key
 # TO FACILIATE MAILING CONTACTS AND AUTO CHECKING, SET UP CRON
 Run crontab add twice:
 ```
-python manage.py crontab add
-python manage.py crontab add
-python manage.py crontab show
+python3 manage.py crontab add
+python3 manage.py crontab add
+python3 manage.py crontab show
 ```
-
-
-# FOREIGN KEY contraint - ISSUE IMPORTING USERS
-The export of the users table to a json file will have an integer representing the group \"USER\" and \"ADMIN\".  
-On a new install these will be  \"1\" and \"2\".   
-On   some older certiffy systems I\'ve seen \"8\" and \"9\".   
-Anyway, this can stop it being imported and you can get the error \'FOREIGN KEY constraint failed\'.   
-You can use vim to:
-```
-s/\[8]/\[1]/g  
-s/\[9]/\[2]/g  
-```
-You can import on the command line:
-```
-python manage.py loaddata imported.json
-```
-
-
