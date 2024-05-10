@@ -360,9 +360,9 @@ def mail(request, id):
                 msg.add_header('Content-Type', 'text')
                 msg.attach(MIMEText(plain_message,'plain'))
                 msg.attach(MIMEText(html_message,'html'))
-                smtp.sendmail( fromfield,
-                              to,
-                              msg=msg.as_string() )
+                smtp.sendmail(from_addr=fromfield,
+                              to_addrs=mailform.cleaned_data["to"],
+                              msg=msg.as_string())
                 smtp.quit()
             except Exception as e:
                 logging.debug(f'SMTP failure {e}')
